@@ -30,6 +30,10 @@
 * バックアップ対象サーバーが増えてもバックアップサーバーの crontab で  
   backup 時間とかを一元管理できる。  
 
+* backup にかかった時間を記録しているので調整がいれやすい。  
+  夜中に張り付くのは嫌  
+
+
 cron にこんな感じで書いておく
 
     ############### example.com ###############
@@ -172,3 +176,19 @@ vim /etc/cron.d/backup
     0 0 * * * masa /home/masa/git/backup-server/backup.sh -r 100 example.com ssh_username 900 3 1 0
 
 systemctl cron reload
+
+
+backup 時間は  
+cat /tmp/backuptime  
+
+    example.com backup start 2016-06-23 19:41:51
+    example.com backup end 2016-06-23 19:41:51
+    example.com transfer start 2016-06-23 19:41:53
+    example.com transfer end 2016-06-23 19:43:13
+	example2.com backup start 2016-06-23 19:45:51
+    example2.com backup end 2016-06-23 19:45:57
+    example2.com transfer start 2016-06-23 19:45:59
+    example2.com transfer end 2016-06-23 19:46:13
+
+こんな感じで記録されるのでなるべくかぶらないように cron を設定すればよい。  
+
