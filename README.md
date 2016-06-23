@@ -47,7 +47,7 @@ vim /etc/sudoers
 ~/backup/production_backup.sh  
 ファイルを設定して置いておく  
 
-production_backup.sh の設定ファイルを設定
+production_backup.sh の設定ファイルを設定  
 -------------------- 設定ファイル ---------------------
 
     # 一意なドメイン名をつける
