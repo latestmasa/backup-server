@@ -37,7 +37,9 @@ cron にこんな感じで書いておく
 
 #### バックアップ対象サーバー
 vim /etc/sudoers  
->#Defaults    requiretty
+
+    #Defaults    requiretty
+
 コメントアウトしておく  
 
 バックアップ対象サーバーに  
