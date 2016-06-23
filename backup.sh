@@ -78,7 +78,7 @@ do
   elif [ $6 = 0 ]; then
     ssh $2@$1 "$production_backup_dir/$backup_script_name" > /dev/null
   elif [ $6 = 1 ]; then
-    ssh $2@$1 "nice -n 19 backup/$backup_script_name" > /dev/null
+    ssh $2@$1 "nice -n 19 $production_backup_dir/$backup_script_name" > /dev/null
   else
     ssh $2@$1 "$production_backup_dir/$backup_script_name" > /dev/null
   fi
