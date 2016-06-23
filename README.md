@@ -74,9 +74,6 @@ vim /etc/sudoers
 
 コメントアウトしておく  
 
-バックアップ対象サーバーに  
-~/backup/production_backup.sh  
-ファイルを設定して置いておく  
 
 production_backup.sh の設定ファイルを設定  
 
@@ -131,9 +128,13 @@ production_backup.sh の設定ファイルを設定
 
 
 設定が終わったら
->ssh server
->mkdir backup
->scp production_backup.sh server:backup/
+バックアップ対象サーバーに  
+~/backup/production_backup.sh  
+ファイルを設定して置いておく  
+
+>ssh server  
+>mkdir backup  
+>scp production_backup.sh server:backup/  
 
 
 nut 直下にサーバなどがあってバックアップ時間が長い場合  
