@@ -1,0 +1,17 @@
+# backup用cronファイル
+# /etc/cron.d/backupに置く
+##################################### 使い方 #######################################################
+# scp転送レートは(単位はKbit/秒)900くらいでいいかも(これで帯域1Mを占有する)
+# backupを始める時間は10分くらいずつずらしておく
+# [*]がついているものは必須
+# 0 3 * * * userneme /backup/backup.sh [option -r rsync_rate -n backup_script_name  -c[rsync_ionice]] [*domain] [*user] [*scprate] [*genaration] [*scp:0 rsync:1] [niceflg]
+####################################################################################################
+
+############### example.com ###############
+0 0 * * * masa /backup/backup.sh -r 100 example.com ssh_username 900 3 1 0
+
+############### example2.com ###############
+0 0 * * * masa /backup/backup.sh -r 100 example2.com ssh_username 900 3 1 0
+
+############### samba example.com ###############
+10 6 * * * masa /backup/samba_backup.sh -r 100 example.com ssh_username 3
