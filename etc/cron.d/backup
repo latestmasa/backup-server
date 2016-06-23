@@ -8,10 +8,10 @@
 ####################################################################################################
 
 ############### example.com ###############
-0 0 * * * masa /backup/backup.sh -r 100 example.com ssh_username 900 3 1 0
+0 0 * * * masa /home/masa/git/backup-server/backup.sh -r 100 example.com ssh_username 900 3 1 0
 
 ############### example2.com ###############
-0 0 * * * masa /backup/backup.sh -r 100 example2.com ssh_username 900 3 1 0
+0 0 * * * masa /home/masa/git/backup-server/backup.sh -r 100 example2.com ssh_username 900 3 1 0
 
 ############### samba example.com ###############
-10 6 * * * masa /backup/samba_backup.sh -r 100 example.com ssh_username 3
+10 6 * * * masa /home/masa/git/backup-server/samba_backup.sh -r 100 example.com ssh_username 3

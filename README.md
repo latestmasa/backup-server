@@ -8,7 +8,7 @@
   サーバのデータがでかすぎて転送量がもったいない場合にも有効  
 * サーバの帯域を使い切らないようにバックアップする  
   ユーザーエクスペリエンスを落としてはいけない  
-* coreutils と bash と ssh くらいしか依存しないのでどのサーバーでも動く  
+* coreutils と bash と ssh と rsync くらいしか依存しないのでどのサーバーでも動く  
   run anywhere  
 * サーバーごとに違うバックアップメソッドを設定できる  
   production_backup.sh をサーバごとに違うファイルにできるため  
@@ -18,7 +18,7 @@
 cron にこんな感じで書いておく
 
     ############### example.com ###############
-    0 0 * * * masa /backup/backup.sh -r 100 example.com ssh_username 900 3 1 0
+    0 0 * * * masa /home/masa/git/backup-server/backup.sh -r 100 example.com ssh_username 900 3 1 0
 
  backup するサイトごとに設定を変更する($5 までは必須)
  
@@ -110,8 +110,6 @@ production_backup.sh の設定ファイルを設定
     # ここを変更するなら backup.sh の$production_backup_dir も変更する
     BACKUP_DIR=~/backup
 
--------------------------------------------------------------------------
-
 
 nut 直下にサーバなどがあってバックアップ時間が長い場合  
 バックアップ中に接続が切れることが多いので本番サーバに以下の設定をしておく  
@@ -122,6 +120,12 @@ vim /etc/ssh/sshd_config
 
 
 ### backup を置いておくサーバ
+
+backup.sh
+
+    RSYNC_SERVER_DIR=/home/htdocs/$1
+
+rsync を使う場合最低この変数は設定しなければいけない   
 
 ssh の設定  
 vim /etc/ssh/ssh_config  
@@ -143,6 +147,6 @@ cron を設定する
 vim /etc/cron.d/backup  
 
     ############### example.com ###############
-    0 0 * * * masa /backup/backup.sh -r 100 example.com ssh_username 900 3 1 0
+    0 0 * * * masa /home/masa/git/backup-server/backup.sh -r 100 example.com ssh_username 900 3 1 0
 
 systemctl cron reload

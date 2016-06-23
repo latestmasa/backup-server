@@ -21,6 +21,10 @@
 #    例 -n example.jp_backup.sh
 ####################################################################################################
 
+# rsync使う場合のバックアップ対象サーバーのrsync対象ディレクトリ
+# /home/htdocs/$1 つまり /home/htdocs/example.com であることを想定している
+RSYNC_SERVER_DIR=/home/htdocs/$1
+###############################
 BACKUP_DIR=${PWD}/backup
 RSYNC_DIR=${PWD}/rsync
 backup_script_name=production_backup.sh
@@ -205,11 +209,11 @@ do
     elif [ $5 = 1 -a $mysqldumpflg != 0 ]; then
       # backupしたデータを本番サーバからbackupサーバに転送するrsync
       if [ "$rsync_rate_flg" = "TRUE" -a "$rsync_ionice_nice_flg" = "TRUE" ]; then
-        rsync -az --bwlimit=$rsync_rate --delete --rsync-path="ionice -c2 -n7 nice -n19 rsync" --exclude '*tmp/sessions/sess_[0-9a-z]*' -e ssh $2@$1:/home/htdocs/$1/$name/ $RSYNC_DIR/$1/$name
+        rsync -az --bwlimit=$rsync_rate --delete --rsync-path="ionice -c2 -n7 nice -n19 rsync" --exclude '*tmp/sessions/sess_[0-9a-z]*' -e ssh $2@$1:$RSYNC_SERVER_DIR/ $RSYNC_DIR/$1/
       elif [ "$rsync_rate_flg" = "TRUE" ]; then
-        rsync -az --bwlimit=$rsync_rate --delete --exclude '*tmp/sessions/sess_[0-9a-z]*' -e ssh $2@$1:/home/htdocs/$1/$name/ $RSYNC_DIR/$1/$name
+        rsync -az --bwlimit=$rsync_rate --delete --exclude '*tmp/sessions/sess_[0-9a-z]*' -e ssh $2@$1:$RSYNC_SERVER_DIR/ $RSYNC_DIR/$1/
       else
-        rsync -az --bwlimit=100 --delete --exclude '*tmp/sessions/sess_[0-9a-z]*' -e ssh $2@$1:/home/htdocs/$1/$name/ $RSYNC_DIR/$1/$name
+        rsync -az --bwlimit=100 --delete --exclude '*tmp/sessions/sess_[0-9a-z]*' -e ssh $2@$1:$RSYNC_SERVER_DIR/ $RSYNC_DIR/$1/
       fi
 
     # ERROR
@@ -235,19 +239,19 @@ do
         case $ext in
 
         'tar.gz')
-            tar cvzf $BACKUP_DIR/$1/$name.new.$ext $RSYNC_DIR/$1/$name > /dev/null
+            tar cvzf $BACKUP_DIR/$1/$name.new.$ext $RSYNC_DIR/$1 > /dev/null
             ;;
 
         'tar.bz2')
-            tar jcvf $BACKUP_DIR/$1/$name.new.$ext $RSYNC_DIR/$1/$name > /dev/null
+            tar jcvf $BACKUP_DIR/$1/$name.new.$ext $RSYNC_DIR/$1 > /dev/null
             ;;
 
         'tar.7z')
-            tar cf - $RSYNC_DIR/$1/$name | 7za a -si $BACKUP_DIR/$1/$name.new.$ext > /dev/null
+            tar cf - $RSYNC_DIR/$1 | 7za a -si $BACKUP_DIR/$1/$name.new.$ext > /dev/null
             ;;
 
         'afz')
-            find $RSYNC_DIR/$1/$name | afio -oZ $BACKUP_DIR/$1/$name.new.$ext
+            find $RSYNC_DIR/$1 | afio -oZ $BACKUP_DIR/$1/$name.new.$ext
             ;;
 
         *)
