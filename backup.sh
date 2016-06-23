@@ -24,6 +24,7 @@
 # rsync使う場合のバックアップ対象サーバーのrsync対象ディレクトリ
 # /home/htdocs/$1 つまり /home/htdocs/example.com であることを想定している
 RSYNC_SERVER_DIR=/home/htdocs/$1
+MAILTO=yourmailaddress@example.com
 ###############################
 BACKUP_DIR=${PWD}/backup
 RSYNC_DIR=${PWD}/rsync
@@ -60,7 +61,7 @@ shift `expr $OPTIND - 1`
 
 
 if [ -z $1 -o -z $2 -o -z $3 -o -z $4 -o -z $5 ]; then
-  echo Usage: $0 [domain] [user] [scp transfer rate] [generation] [scp:0 or rsync:1] | mail -s $0 root
+  echo Usage: $0 [domain] [user] [scp transfer rate] [generation] [scp:0 or rsync:1] | mail -s $0 $MAILTO
   exit 1
 fi
 
@@ -92,7 +93,7 @@ do
 
     # 3回まで試行してダメなら諦めて管理者にメール
     if [ $ssh_trial -gt 3 ]; then
-      echo "orz $1 ssh in a state of emergency!!" | mail -s $0 root
+      echo "orz $1 ssh in a state of emergency!!" | mail -s $0 $MAILTO
       exit 1
     fi
 
@@ -118,7 +119,7 @@ do
 
     # 3回まで試行してダメなら諦めて管理者にメール
     if [ $success_trial -gt 3 ]; then
-      echo "orz $1 production_backup failure" | mail -s $0 root
+      echo "orz $1 production_backup failure" | mail -s $0 $MAILTO
       exit 1
     fi
 
@@ -137,7 +138,7 @@ for targettime in `ssh $2@$1 "cat /tmp/$1-backuptime"`; do
 
     # 3回まで試行してダメなら諦めて管理者にメール
     if [ $ssh_time_trial -gt 3 ]; then
-      echo "orz $1 ssh_time in a state of emergency!!" | mail -s $0 root
+      echo "orz $1 ssh_time in a state of emergency!!" | mail -s $0 $MAILTO
       exit 1
     fi
 
@@ -164,7 +165,7 @@ for target in `ssh $2@$1 "find backup/$1/ -daystart -mtime -1 -type f ! -regex '
 
     # 3回まで試行してダメなら諦めて管理者にメール
     if [ $ssh_find_trial -gt 3 ]; then
-      echo "orz $1 ssh_find in a state of emergency!!" | mail -s $0 root
+      echo "orz $1 ssh_find in a state of emergency!!" | mail -s $0 $MAILTO
       exit 1
     fi
 
@@ -180,7 +181,7 @@ done
 
 if [ $dataflg = 1 ]; then
   # 今日保存されたバックアップデータが存在しない
-  echo "orz $1 There is no backup of today" | mail -s $0 root
+  echo "orz $1 There is no backup of today" | mail -s $0 $MAILTO
   exit 1
 fi
 
@@ -218,7 +219,7 @@ do
 
     # ERROR
     else
-      echo "orz $1 Plese select scp or rsync" | mail -s $0 root
+      echo "orz $1 Plese select scp or rsync" | mail -s $0 $MAILTO
       exit 1
     fi
 
@@ -227,7 +228,7 @@ do
 
       # 3回まで試行してダメなら諦める
       if [ $scp_trial -gt 3 ]; then
-        echo "orz $1 scp in a state of emergency!!" | mail -s $0 root
+        echo "orz $1 scp in a state of emergency!!" | mail -s $0 $MAILTO
         break
       fi
 
@@ -255,7 +256,7 @@ do
             ;;
 
         *)
-            echo "$1 wrong rsync backup method!" | mail -s $0 root
+            echo "$1 wrong rsync backup method!" | mail -s $0 $MAILTO
             exit 1
             ;;
 
@@ -263,7 +264,7 @@ do
 
         # backupに失敗したら管理者にメールして該当データのローテート処理をとばす(データ保護のため)
         if [ $? != 0 ]; then
-          echo "$1 rsync backup $name.new.$ext failure!" | mail -s $0 root
+          echo "$1 rsync backup $name.new.$ext failure!" | mail -s $0 $MAILTO
           continue
         fi
       fi

@@ -1,4 +1,4 @@
-#### Synopsis
+# Synopsis
 
 * backup ディレクトリにサーバのバックアップデータが生成される  
   backup されたデータは git 管理されない  
@@ -43,7 +43,7 @@ cron にこんな感じで書いておく
     例 -n example.jp_backup.sh
 
 
-# 準備
+## 準備
 
 ssh が公開鍵認証でパスワード無しで接続しているのが前提  
 
@@ -121,11 +121,12 @@ vim /etc/ssh/sshd_config
 
 ### backup を置いておくサーバ
 
-backup.sh
+vim backup.sh  
 
     RSYNC_SERVER_DIR=/home/htdocs/$1
+    MAILTO=yourmailaddress@example.com
 
-rsync を使う場合最低この変数は設定しなければいけない   
+最低この変数は設定しなければいけない   
 
 ssh の設定  
 vim /etc/ssh/ssh_config  
