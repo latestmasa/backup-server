@@ -6,6 +6,7 @@
 # ~/backup/production_backup.sh に置く
 
 ##################################### 設定ファイル #######################################################
+MAILTO=yourmailaddress@example.com
 # 一意なドメイン名をつける
 DOMAIN=example.com
 
@@ -88,7 +89,7 @@ for target in $TARGETS; do
           ;;
 
   *)
-          echo "$DOMAIN wrong backup method!" | mail -s $0 root
+          echo "$DOMAIN wrong backup method!" | mail -s $0 $MAILTO
           exit 1
           ;;
 
@@ -96,7 +97,7 @@ for target in $TARGETS; do
 
   # backupに失敗したら管理者にメールして該当データのローテート処理をとばす(データ保護のため)
   if [ $? != 0 ]; then
-    echo "$DOMAIN backup $name.new.$METHOD failure!" | mail -s $0 root
+    echo "$DOMAIN backup $name.new.$METHOD failure!" | mail -s $0 $MAILTO
     continue
   fi
 
@@ -135,7 +136,7 @@ for dbtarget in $DATABASE_NAME; do
             ;;
 
     *)
-            echo "$DOMAIN wrong mysql backup method!" | mail -s $0 root
+            echo "$DOMAIN wrong mysql backup method!" | mail -s $0 $MAILTO
             exit 1
             ;;
 
@@ -146,12 +147,12 @@ for dbtarget in $DATABASE_NAME; do
   if [ $? != 0 ]; then
     case $BACKUPMETHOD in
       'mysqldump')
-            echo "$DOMAIN mysql backup mysql-dump_$dbtarget.new.gz failure!" | mail -s $0 root
+            echo "$DOMAIN mysql backup mysql-dump_$dbtarget.new.gz failure!" | mail -s $0 $MAILTO
             continue
             ;;
 
       *)
-            echo "$DOMAIN wrong mysql backup method!" | mail -s $0 root
+            echo "$DOMAIN wrong mysql backup method!" | mail -s $0 $MAILTO
             exit 1
             ;;
 

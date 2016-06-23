@@ -15,3 +15,6 @@
 
 ############### samba example.com ###############
 10 6 * * * masa /home/masa/git/backup-server/samba_backup.sh -r 100 example.com ssh_username 3
+
+############### wget example.com ###############
+0 4 * * * masa /home/masa/git/backup-server/wget.sh example.com

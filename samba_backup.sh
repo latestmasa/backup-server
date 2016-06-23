@@ -2,6 +2,8 @@
 # samba_backup.sh
 # sambaサーバ用backupスクリプト
 
+MAILTO=yourmailaddress@example.com
+
 ##################################### 使い方 #######################################################
 # $1 sambaサーバのドメインを指定する
 # $2 sambaサーバのログインuser名を指定する
@@ -28,6 +30,7 @@ ext=tar.gz
 
 BACKUP_DIR=${PWD}/backup
 RSYNC_DIR=${PWD}/rsync
+SAMBA_DIR=/home/samba
 
 
 while getopts cr: OPT
@@ -49,7 +52,7 @@ shift `expr $OPTIND - 1`
 
 
 if [ -z $1 -o -z $2 -o -z $3 ]; then
-  echo Usage: $0 [domain] [user] [generation] | mail -s $0 root
+  echo Usage: $0 [domain] [user] [generation] | mail -s $0 $MAILTO
   exit 1
 fi
 
@@ -74,11 +77,11 @@ fi
 
 # RSYNC
 if [ "$rsync_rate_flg" = "TRUE" -a "$rsync_ionice_nice_flg" = "TRUE" ]; then
-  rsync -az --bwlimit=$rsync_rate --delete --rsync-path="ionice -c2 -n7 nice -n19 rsync" -e ssh $2@$1:/home/samba/ $RSYNC_DIR/$1/samba
+  rsync -az --bwlimit=$rsync_rate --delete --rsync-path="ionice -c2 -n7 nice -n19 rsync" -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
 elif [ "$rsync_rate_flg" = "TRUE" ]; then
-  rsync -az --bwlimit=$rsync_rate --delete -e ssh $2@$1:/home/samba/ $RSYNC_DIR/$1/samba
+  rsync -az --bwlimit=$rsync_rate --delete -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
 else
-  rsync -az --bwlimit=100 --delete -e ssh $2@$1:/home/samba/ $RSYNC_DIR/$1/samba
+  rsync -az --bwlimit=100 --delete -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
 fi
 
 
@@ -101,7 +104,7 @@ case $ext in
         ;;
 
     *)
-        echo "$1 samba wrong rsync backup method!" | mail -s $0 root
+        echo "$1 samba wrong rsync backup method!" | mail -s $0 $MAILTO
         exit 1
         ;;
 
@@ -109,7 +112,7 @@ esac
 
 # backupに失敗したら管理者にメールして該当データのローテート処理をとばす(データ保護のため)
 if [ $? != 0 ]; then
-  echo "$1 samba rsync backup samba.new.$ext failure!" | mail -s $0 root
+  echo "$1 samba rsync backup samba.new.$ext failure!" | mail -s $0 $MAILTO
   exit 1
 fi
 
