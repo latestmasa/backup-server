@@ -33,6 +33,7 @@ cron にこんな感じで書いておく
     更する場合に指定する
     例 -n example.jp_backup.sh
 
+
 # 準備
 
 #### バックアップ対象サーバー
@@ -45,6 +46,61 @@ vim /etc/sudoers
 バックアップ対象サーバーに  
 ~/backup/production_backup.sh  
 ファイルを設定して置いておく  
+
+production_backup.sh の設定ファイルを設定
+-------------------- 設定ファイル ---------------------
+
+    # 一意なドメイン名をつける
+    DOMAIN=example.com
+
+    # 保存したいディレクトリが複数ある場合は半角スペースで区切る
+    # 例:TARGETS="/home/masa /home/samba"
+    TARGETS="/home/htdocs/$DOMAIN/master"
+
+    # バックアップ方法を指定する(圧縮率はデータによる)
+    # afz     安全性重視 backup データが損傷を受けても損傷を受けた場所以外は修復できる 圧縮率 85% CPU 負荷 10% 圧縮時間 2 倍
+    #       解凍方法 cd backup/example.com;
+    #          afio -ivZ /backup/example.com/dev.new.afz
+    #       必要条件:yum install afio ; yaourt afio
+    # tar.gz  unix 標準 backup データが損傷を受けるとそれ以降のデータは保証されない 以下 tar を使うのは同じ問題をもつ
+    # tar.7z  圧縮率重視 65%程度 圧縮時間 6.5 倍 CPU 負荷大 メモリー消費 74 倍(tar.gz 比)
+    #       解凍方法 cd backup/example.com;
+    #          7za x -so dev.new.tar.7z | tar xf -
+    #       必要条件:yum install p7zip ; pacman -S p7zip
+    # tar.bz2 圧縮率は 2 番目に良い 圧縮時間 2.5 倍 メモリ消費 8 倍(tar.gz 比)
+    METHOD=tar.gz
+
+    # backup を保存する世代を指定
+    GENS=3
+
+
+    # mysqlbackup の設定
+    BACKUPMETHOD=mysqldump
+    # 保存したいデータベースが複数ある場合は半角スペースで区切る
+    # 例:DATABASE_NAME="exampledb exampledbdev"
+    DATABASE_NAME="exampledb"
+    # 複数のデータベースを保存するなら root を指定
+    MYSQLUSER=root
+    MYSQLPASSWORD=mysqlrootpassword
+    MYSQLSOCK=/var/lib/mysql/mysql.sock
+    # リストア方法
+    # gzip -d mysql-dump_exampledb.gz
+    # mysql --user=root --password=mysqlrootpassword \
+    #        --socket=/var/lib/mysql/mysql.sock \
+    #        exampledb < mysql-dump_exampledb
+
+
+    # サーバの IO 負荷が高い場合はこれを変更する(バックアップは遅くなるので注意)
+    # 0  IO ベストエフォート
+    # 1  一般ユーザの権限でもっとも IO の負荷が少ない設定
+    # 2  IO がアイドル時だけバックアップが走る(root 権限が必要)
+    ionice_flg=0
+
+    # ここを変更するなら backup.sh の$production_backup_dir も変更する
+    BACKUP_DIR=~/backup
+
+-------------------------------------------------------------------------
+
 
 nut 直下にサーバなどがあってバックアップ時間が長い場合  
 バックアップ中に接続が切れることが多いので本番サーバに以下の設定をしておく  
