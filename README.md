@@ -63,6 +63,7 @@ cron にこんな感じで書いておく
 ssh が公開鍵認証でパスワード無しで接続しているのが前提  
 
 #### バックアップ対象サーバー
+
 vim /etc/sudoers  
 
     #Defaults    requiretty
@@ -74,7 +75,6 @@ vim /etc/sudoers
 ファイルを設定して置いておく  
 
 production_backup.sh の設定ファイルを設定  
--------------------- 設定ファイル ---------------------
 
     # 一意なドメイン名をつける
     DOMAIN=example.com
@@ -124,6 +124,12 @@ production_backup.sh の設定ファイルを設定
 
     # ここを変更するなら backup.sh の$production_backup_dir も変更する
     BACKUP_DIR=~/backup
+
+
+設定が終わったら
+>ssh server
+>mkdir backup
+>scp production_backup.sh server:backup/
 
 
 nut 直下にサーバなどがあってバックアップ時間が長い場合  
