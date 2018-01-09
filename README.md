@@ -1,7 +1,6 @@
 # Synopsis
 
-This is a backup script of a fucking server that is not source  
-controlled by git  
+Backup script of a server that is not source controlled by git  
 
 * Server backup data is created in the backup directory  
   Data that was backed up is not git managed  
