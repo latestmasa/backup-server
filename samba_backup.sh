@@ -15,53 +15,53 @@ SAMBA_DIR=/home/samba
 
 while getopts cr: OPT
 do
-  case $OPT in
-    'c') rsync_ionice_nice_flg="TRUE"
-        ;;
+    case $OPT in
+	'c') rsync_ionice_nice_flg="TRUE"
+             ;;
 
-    'r') rsync_rate_flg="TRUE";
-           rsync_rate="$OPTARG"
-        ;;
+	'r') rsync_rate_flg="TRUE";
+             rsync_rate="$OPTARG"
+             ;;
 
-     * ) break
-        ;;
-  esac
+	* ) break
+            ;;
+    esac
 done
 
 shift `expr $OPTIND - 1`
 
 
 if [ -z $1 -o -z $2 -o -z $3 ]; then
-  echo Usage: $0 [domain] [user] [generation] | mail -s $0 $MAILTO
-  exit 1
+    echo Usage: $0 [domain] [user] [generation] | mail -s $0 $MAILTO
+    exit 1
 fi
 
 
 if [ ! -d $BACKUP_DIR/$1 ]; then
-  mkdir -p $BACKUP_DIR/$1
+    mkdir -p $BACKUP_DIR/$1
 fi
 
 if [ ! -d $RSYNC_DIR/$1 ]; then
-  mkdir -p $RSYNC_DIR/$1
+    mkdir -p $RSYNC_DIR/$1
 fi
 
 
 # Save backup time
 find /tmp/ -daystart -mtime -1 -type f -name backuptime | grep backuptime > /dev/null
 if [ $? = 0 ]; then
-  echo "$1 samba transfer start "`date +%Y"-"%m"-"%d" "%H':'%M':'%S` >> /tmp/backuptime
+    echo "$1 samba transfer start "`date +%Y"-"%m"-"%d" "%H':'%M':'%S` >> /tmp/backuptime
 else
-  echo "$1 samba transfer start "`date +%Y"-"%m"-"%d" "%H':'%M':'%S` > /tmp/backuptime
+    echo "$1 samba transfer start "`date +%Y"-"%m"-"%d" "%H':'%M':'%S` > /tmp/backuptime
 fi
 
 
 # RSYNC
 if [ "$rsync_rate_flg" = "TRUE" -a "$rsync_ionice_nice_flg" = "TRUE" ]; then
-  rsync -az --bwlimit=$rsync_rate --delete --rsync-path="ionice -c2 -n7 nice -n19 rsync" -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
+    rsync -az --bwlimit=$rsync_rate --delete --rsync-path="ionice -c2 -n7 nice -n19 rsync" -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
 elif [ "$rsync_rate_flg" = "TRUE" ]; then
-  rsync -az --bwlimit=$rsync_rate --delete -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
+    rsync -az --bwlimit=$rsync_rate --delete -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
 else
-  rsync -az --bwlimit=100 --delete -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
+    rsync -az --bwlimit=100 --delete -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
 fi
 
 
@@ -92,8 +92,8 @@ esac
 
 # If backup fails, e-mail the administrator and skip the rotation process of the corresponding data
 if [ $? != 0 ]; then
-  echo "$1 samba rsync backup samba.new.$ext failure!" | mail -s $0 $MAILTO
-  exit 1
+    echo "$1 samba rsync backup samba.new.$ext failure!" | mail -s $0 $MAILTO
+    exit 1
 fi
 
 
@@ -101,18 +101,18 @@ fi
 gens=`expr $3 - 1`
 
 while [ $gens -gt 1 ]; do
-  gens=`expr $gens - 1`
-  archive=$BACKUP_DIR/$1/samba.$gens.$ext
-  if [ -f $archive ]; then
-    archive2=$BACKUP_DIR/$1/samba.`expr $gens + 1`.$ext
-    mv -f $archive $archive2
-  fi
+    gens=`expr $gens - 1`
+    archive=$BACKUP_DIR/$1/samba.$gens.$ext
+    if [ -f $archive ]; then
+	archive2=$BACKUP_DIR/$1/samba.`expr $gens + 1`.$ext
+	mv -f $archive $archive2
+    fi
 done
 
 archive=$BACKUP_DIR/$1/samba.$ext
 if [ -f $archive ]; then
-  archive2=$BACKUP_DIR/$1/samba.1.$ext
-  mv -f $archive $archive2
+    archive2=$BACKUP_DIR/$1/samba.1.$ext
+    mv -f $archive $archive2
 fi
 
 
