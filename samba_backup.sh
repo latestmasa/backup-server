@@ -49,14 +49,14 @@ fi
 # Save backup time
 find /tmp/ -daystart -mtime -1 -type f -name backuptime | grep backuptime > /dev/null
 if [ $? = 0 ]; then
-    echo "$1 samba transfer start "`date +%Y"-"%m"-"%d" "%H':'%M':'%S` >> /tmp/backuptime
+    echo "$1 samba transfer start $(date +%Y-%m-%d-%H:%M:%S)" >> /tmp/backuptime
 else
-    echo "$1 samba transfer start "`date +%Y"-"%m"-"%d" "%H':'%M':'%S` > /tmp/backuptime
+    echo "$1 samba transfer start $(date +%Y-%m-%d-%H:%M:%S)" > /tmp/backuptime
 fi
 
 
 # RSYNC
-if [ "$rsync_rate_flg" = "TRUE" -a "$rsync_ionice_nice_flg" = "TRUE" ]; then
+if [ "$rsync_rate_flg" = "TRUE" ] && [ "$rsync_ionice_nice_flg" = "TRUE" ]; then
     rsync -az --bwlimit=$rsync_rate --delete --rsync-path="ionice -c2 -n7 nice -n19 rsync" -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
 elif [ "$rsync_rate_flg" = "TRUE" ]; then
     rsync -az --bwlimit=$rsync_rate --delete -e ssh $2@$1:$SAMBA_DIR/ $RSYNC_DIR/$1/samba
@@ -118,5 +118,5 @@ fi
 
 mv -f $BACKUP_DIR/$1/samba.new.$ext $BACKUP_DIR/$1/samba.$ext
 
-echo "$1 samba transfer end "`date +%Y"-"%m"-"%d" "%H':'%M':'%S` >> /tmp/backuptime
+echo "$1 samba transfer end $(date +%Y-%m-%d-%H:%M:%S)" >> /tmp/backuptime
 exit 0
