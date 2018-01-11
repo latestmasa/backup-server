@@ -39,23 +39,23 @@ for target in $TARGETS; do
     name=$(basename $target)
     case $METHOD in
 	'tar.gz')
-            tar cvzf $BACKUP_DIR/$DOMAIN/$name.new.$METHOD $target > /dev/null
+            tar cvzf "$BACKUP_DIR/$DOMAIN/$name.new.$METHOD $target > /dev/null"
             ;;
 
 	'tar.bz2')
-            tar jcvf $BACKUP_DIR/$DOMAIN/$name.new.$METHOD $target > /dev/null
+            tar jcvf "$BACKUP_DIR/$DOMAIN/$name.new.$METHOD $target > /dev/null"
             ;;
 
 	'tar.7z')
-            tar cf - $target | 7za a -si $BACKUP_DIR/$DOMAIN/$name.new.$METHOD > /dev/null
+            tar cf - "$target | 7za a -si $BACKUP_DIR/$DOMAIN/$name.new.$METHOD > /dev/null"
             ;;
 
 	'afz')
-            find $target | afio -oZ $BACKUP_DIR/$DOMAIN/$name.new.$METHOD
+            find "$target | afio -oZ $BACKUP_DIR/$DOMAIN/$name.new.$METHOD"
             ;;
 
 	*)
-            echo "$DOMAIN wrong backup method!" | mail -s $0 $MAILTO
+            echo "$DOMAIN wrong backup method!" | mail -s "$0 $MAILTO"
             exit 1
             ;;
 
@@ -63,28 +63,28 @@ for target in $TARGETS; do
 
     # If backup fails, e-mail the administrator and skip the rotation process of the corresponding data
     if [ $? != 0 ]; then
-	echo "$DOMAIN backup $name.new.$METHOD failure!" | mail -s $0 $MAILTO
+	echo "$DOMAIN backup $name.new.$METHOD failure!" | mail -s "$0 $MAILTO"
 	continue
     fi
 
     # Rotate after backup completes normally
-    i=`expr $GENS - 1`
+    i=$(( "$GENS" - 1 ))
     while [ $i -gt 1 ]; do
-	i=`expr $i - 1`
+	i=$(( "$i" - 1 ))
 	archive=$BACKUP_DIR/$DOMAIN/$name.$i.$METHOD
-	if [ -f $archive ]; then
-	    archive2=$BACKUP_DIR/$DOMAIN/$name.`expr $i + 1`.$METHOD
-	    mv -f $archive $archive2
+	if [ -f "$archive" ]; then
+	    archive2=$BACKUP_DIR/$DOMAIN/$name.$(( "$i" + 1 )).$METHOD
+	    mv -f "$archive $archive2"
 	fi
     done
 
     archive=$BACKUP_DIR/$DOMAIN/$name.$METHOD
-    if [ -f $archive ]; then
+    if [ -f "$archive" ]; then
 	archive2=$BACKUP_DIR/$DOMAIN/$name.1.$METHOD
-	mv -f $archive $archive2
+	mv -f "$archive $archive2"
     fi
 
-    mv -f $BACKUP_DIR/$DOMAIN/$name.new.$METHOD $BACKUP_DIR/$DOMAIN/$name.$METHOD
+    mv -f "$BACKUP_DIR/$DOMAIN/$name.new.$METHOD $BACKUP_DIR/$DOMAIN/$name.$METHOD"
 done
 
 
@@ -100,37 +100,35 @@ for dbtarget in $DATABASE_NAME; do
             ;;
 
 	*)
-            echo "$DOMAIN wrong mysql backup method!" | mail -s $0 $MAILTO
+            echo "$DOMAIN wrong mysql backup method!" | mail -s "$0 $MAILTO"
             exit 1
             ;;
 	
     esac
 
-
     # If mysqlbackup fails, e-mail the administrator and skip the rotation process of the corresponding data
     if [ $? != 0 ]; then
 	case $BACKUPMETHOD in
 	    'mysqldump')
-		echo "$DOMAIN mysql backup mysql-dump_$dbtarget.new.gz failure!" | mail -s $0 $MAILTO
+		echo "$DOMAIN mysql backup mysql-dump_$dbtarget.new.gz failure!" | mail -s "$0 $MAILTO"
 		continue
 		;;
 
 	    *)
-		echo "$DOMAIN wrong mysql backup method!" | mail -s $0 $MAILTO
+		echo "$DOMAIN wrong mysql backup method!" | mail -s "$0 $MAILTO"
 		exit 1
 		;;
 
 	esac
     fi
 
-
     # Rotate after backup completes normally
     i=$(( "$GENS" - 1 ))
     while [ $i -gt 1 ]; do
-	i=`expr $i - 1`
+	i=$(( "$i" - 1 ))
 	archive=$BACKUP_DIR/$DOMAIN/mysql-dump_$dbtarget.$i.gz
 	if [ -f $archive ]; then
-	    archive2=$BACKUP_DIR/$DOMAIN/mysql-dump_$dbtarget.`expr $i + 1`.gz
+	    archive2=$BACKUP_DIR/$DOMAIN/mysql-dump_$dbtarget.$(( "$i" + 1 )).gz
 	    mv -f $archive $archive2
 	fi
     done
