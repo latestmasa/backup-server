@@ -58,7 +58,7 @@ production_backup.sh
     DOMAIN=example.com
 
     # If there are multiple directories to be saved, use single-byte spaces to separate
-    # 例:TARGETS="/home/masa /home/samba"
+    # example:TARGETS="/home/masa /home/samba"
     TARGETS="/home/htdocs/$DOMAIN/master"
 
     METHOD=tar.gz
